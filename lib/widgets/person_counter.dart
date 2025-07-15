@@ -5,23 +5,20 @@ class PersonCounter extends StatelessWidget {
     super.key,
     required this.textTheme,
     required int personCount,
-    required this.incrementPersonCount,
-    required this.decrementPersonCount,
+    required this.onIncrementPersonCount,
+    required this.onDecrementPersonCount,
   }) : _personCount = personCount;
 
   final TextStyle textTheme;
   final int _personCount;
-  final VoidCallback incrementPersonCount;
-  final VoidCallback decrementPersonCount;
+  final VoidCallback onIncrementPersonCount;
+  final VoidCallback onDecrementPersonCount;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(
-          'Split',
-          style: textTheme,
-        ),
+        Text('Split', style: textTheme),
         Spacer(),
         IconButton(
           onPressed: () {},
@@ -30,11 +27,8 @@ class PersonCounter extends StatelessWidget {
         Text('$_personCount', style: textTheme),
         IconButton(
           onPressed: () {},
-          icon: Icon(
-            Icons.add,
-            color: textTheme.color,
-          ),
-        )
+          icon: Icon(Icons.add, color: textTheme.color),
+        ),
       ],
     );
   }
