@@ -12,8 +12,16 @@ class UTip extends StatefulWidget {
 
 class _UTipState extends State<UTip> {
   int _personCount = 1;
+  double _tipPercentage = 0.0;
+  double _billTotal = 0.0;
 
-  double _tipPercentage = 0;
+  double totalPerPerson() {
+    return ((_billTotal * _tipPercentage) + (_billTotal)) / _personCount;
+  }
+
+  double totalTip() {
+    return (_billTotal * _tipPercentage);
+  }
 
   void _incrementPersonCount() {
     setState(() {
@@ -22,7 +30,7 @@ class _UTipState extends State<UTip> {
   }
 
   void _decrementPersonCount() {
-    if (_personCount <= 0) {
+    if (_personCount <= 1) {
       return;
     }
     setState(() {
@@ -33,6 +41,8 @@ class _UTipState extends State<UTip> {
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
+    double total = totalPerPerson();
+    var tipTotal = totalTip();
     final style = theme.textTheme.titleMedium!.copyWith(
       color: theme.colorScheme.onPrimary,
       fontWeight: FontWeight.bold,
@@ -82,7 +92,7 @@ class _UTipState extends State<UTip> {
                     children: [
                       Text('Total per person', style: style),
                       Text(
-                        '\$20.12',
+                        '\$ ${total.toStringAsFixed(2)}',
                         style: style.copyWith(
                           fontSize: theme.textTheme.displaySmall!.fontSize,
                           fontWeight: FontWeight.bold,
@@ -103,9 +113,18 @@ class _UTipState extends State<UTip> {
                   ),
                   child: Column(
                     children: [
-                      BillAmountField(textTheme: textTheme, onChanged: (value) {
-                       print('$value');
-                      },),
+                      BillAmountField(
+                        textTheme: textTheme,
+                        billAmount: _billTotal.toString(),
+                        onChanged: (value) {
+                          if (value.isEmpty) {
+                            return;
+                          }
+                          setState(() {
+                            _billTotal = double.parse(value);
+                          });
+                        },
+                      ),
                       PersonCounter(
                         textTheme: textTheme,
                         personCount: _personCount,
@@ -117,7 +136,7 @@ class _UTipState extends State<UTip> {
                         children: [
                           Text('Tip', style: textTheme),
                           const Spacer(),
-                          Text('20.13', style: textTheme),
+                          Text('$tipTotal', style: textTheme),
                         ],
                       ),
                       const SizedBox(height: 8),
