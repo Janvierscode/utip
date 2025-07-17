@@ -1,48 +1,18 @@
 import 'package:flutter/material.dart';
+import "package:provider/provider.dart";
+import 'package:utip/provider/UTipProvider.dart';
 import 'package:utip/widgets/bill_amount_field.dart';
 import 'package:utip/widgets/person_counter.dart';
 import 'package:utip/widgets/tip_slider.dart';
+import 'package:utip/widgets/total_per_person.dart';
 
-class UTip extends StatefulWidget {
+class UTip extends StatelessWidget {
   const UTip({super.key});
 
   @override
-  State<UTip> createState() => _UTipState();
-}
-
-class _UTipState extends State<UTip> {
-  int _personCount = 1;
-  double _tipPercentage = 0.0;
-  double _billTotal = 0.0;
-
-  double totalPerPerson() {
-    return ((_billTotal * _tipPercentage) + (_billTotal)) / _personCount;
-  }
-
-  double totalTip() {
-    return (_billTotal * _tipPercentage);
-  }
-
-  void _incrementPersonCount() {
-    setState(() {
-      _personCount++;
-    });
-  }
-
-  void _decrementPersonCount() {
-    if (_personCount <= 1) {
-      return;
-    }
-    setState(() {
-      _personCount--;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<UTipProvider>(context);
     var theme = Theme.of(context);
-    double total = totalPerPerson();
-    var tipTotal = totalTip();
     final style = theme.textTheme.titleMedium!.copyWith(
       color: theme.colorScheme.onPrimary,
       fontWeight: FontWeight.bold,
@@ -80,26 +50,10 @@ class _UTipState extends State<UTip> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  //color: theme.colorScheme
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text('Total per person', style: style),
-                      Text(
-                        '\$ ${total.toStringAsFixed(2)}',
-                        style: style.copyWith(
-                          fontSize: theme.textTheme.displaySmall!.fontSize,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
+                TotalPerPerson(
+                  theme: theme,
+                  style: style,
+                  total: provider.billTotal,
                 ),
                 Container(
                   margin: const EdgeInsets.only(top: 12),
@@ -115,42 +69,49 @@ class _UTipState extends State<UTip> {
                     children: [
                       BillAmountField(
                         textTheme: textTheme,
-                        billAmount: _billTotal.toString(),
+                        billAmount: provider.billTotal.toString(),
                         onChanged: (value) {
                           if (value.isEmpty) {
                             return;
                           }
-                          setState(() {
-                            _billTotal = double.parse(value);
-                          });
+                          provider.updateBillTotal(double.parse(value));
                         },
                       ),
                       PersonCounter(
                         textTheme: textTheme,
-                        personCount: _personCount,
-                        onIncrementPersonCount: _incrementPersonCount,
-                        onDecrementPersonCount: _decrementPersonCount,
+                        personCount: provider.personCount,
+                        onIncrementPersonCount: () {
+                          provider.updatePersonCount(provider.personCount + 1);
+                        },
+                        onDecrementPersonCount: () {
+                          if (provider.personCount > 1) {
+                            provider.updatePersonCount(
+                              provider.personCount - 1,
+                            );
+                          }
+                        },
                       ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
                           Text('Tip', style: textTheme),
                           const Spacer(),
-                          Text('$tipTotal', style: textTheme),
+                          Text(
+                            '\$ ${provider.totalTip.toStringAsFixed(2)}',
+                            style: textTheme,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '${(_tipPercentage * 100).round()}',
+                        '${(provider.tipPercentage * 100).round()}',
                         style: textTheme,
                       ),
                       const SizedBox(height: 8),
                       TipSlider(
-                        tipPercentage: _tipPercentage,
+                        tipPercentage: provider.tipPercentage,
                         onChanged: (double value) {
-                          setState(() {
-                            _tipPercentage = value;
-                          });
+                          provider.updateTipPercentage(value);
                         },
                       ),
                     ],
