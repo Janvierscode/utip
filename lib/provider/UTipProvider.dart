@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class UTipProvider with ChangeNotifier {
-  int _personCount = 0;
+  int _personCount = 1;
   double _billTotal = 0.0;
   double _tipPercentage = 0;
 

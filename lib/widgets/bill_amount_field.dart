@@ -5,12 +5,12 @@ class BillAmountField extends StatelessWidget {
     super.key,
     required this.textTheme,
     required this.onChanged,
-    required this.billAmount,
+    // required this.billAmount,
   });
 
   final TextStyle textTheme;
   final ValueChanged<String> onChanged;
-  final String billAmount;
+  // final String billAmount;
 
   @override
   Widget build(BuildContext context) {

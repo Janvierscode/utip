@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import "package:provider/provider.dart";
+import 'package:utip/provider/ThemeProvider.dart';
 import 'package:utip/provider/UTipProvider.dart';
 import 'package:utip/widgets/bill_amount_field.dart';
 import 'package:utip/widgets/person_counter.dart';
+import 'package:utip/widgets/tip_row.dart';
 import 'package:utip/widgets/tip_slider.dart';
 import 'package:utip/widgets/total_per_person.dart';
 
@@ -12,6 +14,7 @@ class UTip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<UTipProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
     var theme = Theme.of(context);
     final style = theme.textTheme.titleMedium!.copyWith(
       color: theme.colorScheme.onPrimary,
@@ -21,23 +24,19 @@ class UTip extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'uTip',
-          style: textTheme.copyWith(
-            fontSize: theme.textTheme.titleLarge!.fontSize,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
+        title: Text('uTip'),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: IconButton(
-              onPressed: () {},
+              onPressed: themeProvider.toggleTheme,
               icon: Icon(
-                Icons.toggle_off_outlined,
+                themeProvider.isDarkMode
+                    ? Icons.light_mode_outlined
+                    : Icons.dark_mode_outlined,
                 color: theme.colorScheme.primary,
                 fill: 0.5,
-                size: 50,
+                size: 30,
               ),
             ),
           ),
@@ -53,7 +52,7 @@ class UTip extends StatelessWidget {
                 TotalPerPerson(
                   theme: theme,
                   style: style,
-                  total: provider.billTotal,
+                  total: provider.totalPerPerson,
                 ),
                 Container(
                   margin: const EdgeInsets.only(top: 12),
@@ -69,7 +68,7 @@ class UTip extends StatelessWidget {
                     children: [
                       BillAmountField(
                         textTheme: textTheme,
-                        billAmount: provider.billTotal.toString(),
+                        // billAmount: provider.billTotal.toString(),
                         onChanged: (value) {
                           if (value.isEmpty) {
                             return;
@@ -92,16 +91,7 @@ class UTip extends StatelessWidget {
                         },
                       ),
                       const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Text('Tip', style: textTheme),
-                          const Spacer(),
-                          Text(
-                            '\$ ${provider.totalTip.toStringAsFixed(2)}',
-                            style: textTheme,
-                          ),
-                        ],
-                      ),
+                      TipRow(textTheme: textTheme, totalTip: provider.totalTip),
                       const SizedBox(height: 8),
                       Text(
                         '${(provider.tipPercentage * 100).round()}',

@@ -19,7 +19,6 @@ class TipSlider extends StatelessWidget {
       onChanged: onChanged,
 
       label: '${(_tipPercentage * 100).round()}',
-      autofocus: true,
     );
   }
 }
